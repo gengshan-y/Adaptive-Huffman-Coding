@@ -44,6 +44,8 @@ class BitInputStream {
   
   /** Return the nth bit from the right of a byte argument **/
   unsigned char bitValue(unsigned char b, int n);
+
+  int readSym();
 };
 
 #endif  // BITINSTREAM_HPP

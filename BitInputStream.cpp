@@ -34,3 +34,11 @@ unsigned char BitInputStream::bitValue(unsigned char buf, int n) {
   buf = buf & 0x01;  // && is not for logic operator 
   return buf;
 }
+
+int BitInputStream::readSym() {
+  int tempBit = 0;
+  for (int i = 0; i < 9; i++) {
+    tempBit = tempBit + (readBit() <<  i);
+  }
+return tempBit;
+}

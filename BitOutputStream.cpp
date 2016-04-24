@@ -37,3 +37,10 @@ void BitOutputStream::writeBit(int i) {
   // Increment the index
   nbits++;
 }
+
+void BitOutputStream::writeSym(int symbol) {
+  for (int i = 0; i < 8; i++) {
+    writeBit((symbol >> i) & 0x01);
+  }
+  writeBit(1);
+}

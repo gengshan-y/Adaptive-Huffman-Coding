@@ -6,14 +6,14 @@ LDFLAGS= -g
 
 all: compress uncompress
 
-compress: BitInputStream.o BitOutputStream.o HCNode.o HCTree.o
+compress: BitInputStream.o BitOutputStream.o AHCNode.o AHCTree.o
 
-uncompress: BitInputStream.o BitOutputStream.o HCNode.o HCTree.o
+uncompress: BitInputStream.o BitOutputStream.o AHCNode.o AHCTree.o
 
 # should use .hpp instead of .o ??
-HCTree.o: BitInputStream.hpp BitOutputStream.hpp HCNode.hpp HCTree.hpp
+AHCTree.o: BitInputStream.hpp BitOutputStream.hpp AHCNode.hpp AHCTree.hpp
 
-HCNode.o: HCNode.hpp
+AHCNode.o: AHCNode.hpp
 
 BitOutputStream.o: BitOutputStream.hpp
 

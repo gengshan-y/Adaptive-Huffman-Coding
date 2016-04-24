@@ -47,6 +47,9 @@ class BitOutputStream {
    ** But flush the buffer first, if it is full.
    */
   void writeBit(int i);
+
+  /** **/
+  void writeSym(int symbol);
 };
 
 #endif  // BITOUTSTREAM_HPP

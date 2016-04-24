@@ -14,7 +14,7 @@
  ***/
 
 #include <fstream>
-#include "HCTree.hpp"
+#include "AHCTree.hpp"
 
 using namespace std;
 
@@ -52,35 +52,14 @@ int main(int argc, char* argv[]) {
 
   if (in.is_open()) {
     /*** MAIN IMPLIMENTATION OF UNCOMPRESS***/
-    vector<unsigned int> freqs (256, 0);
-    HCTree HCT;
-    unsigned int tempCount;  // number of total symbols
-    unsigned char tempUnCount;  // number of unique symbols
-
-    /** Read lastBuffer and count information **/
-    in.read((char*)&tempCount, sizeof(tempCount));
-    in.read((char*)&tempUnCount, sizeof(tempUnCount));
-
-    /** Read frequency info **/
-    unsigned int symAndFreqs;
-    unsigned char tempIndex;
-    for (int i = tempUnCount + 1; i > 0; i--) {
-      in.read((char*)&symAndFreqs, sizeof(symAndFreqs));
-      tempIndex = symAndFreqs >> 24;
-      freqs[tempIndex] = (symAndFreqs << 8) >> 8;
-    }
-    
-    /** Build the Huffman coding trie in HCT **/
-    HCT.build(freqs);
+    AHCTree AHCT(out, in);
 
     /** Decode using bit buffer **/
     int tempSymbol;
-    BitInputStream inBuf(in);
-    while (!in.eof() && tempCount) {
-      tempSymbol = HCT.decode(inBuf);
-      if (tempSymbol != EOF)
-        out << (byte)tempSymbol;
-      tempCount --;
+    while (!in.eof()) {
+      tempSymbol = AHCT.decode();
+      if (tempSymbol != 0x01ff)
+        out << (unsigned char)tempSymbol;
     }
   } 
   return 0;
