@@ -38,12 +38,13 @@ int main(int argc, char* argv[]) {
 
   if (in.is_open()) {
     /*** MAIN FUNCTION IMPLIMENTATION ***/
-    AHCTree AHCT(out, in);   // initialize AHC Tree
+    AHCTree AHCT(out, in);   // initialize tree, through use out stream
     int tempChar;  // temporary read symbol
 
-    /** Count the freqs of symbols **/
+    /** Adaptively build tree and encode symbols **/
     while ( (tempChar = in.get()) != EOF ) {  // EOF defined as -1
       AHCT.encode(tempChar);
+      cout << tempChar << ','<< endl;
     }
     
     /* flush all the rest */

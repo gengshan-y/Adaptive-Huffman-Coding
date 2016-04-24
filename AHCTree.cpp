@@ -27,11 +27,11 @@ void AHCTree::deleteAll(AHCNode* n) {  // dont need to declare static this time
 
 void AHCTree::encode(int symbol) {
   if (!leaves[symbol]) {  // no symbol of that leaf was build before
-    outbuf.writeSym(symbol);  // write the ascii of symbol
     writePath(NYT);  // write the path from root to NYT
+    outbuf.writeSym(symbol);  // write the ascii of symbol
   }
   else 
-    writePath(leaves[symbol]);
+    writePath(leaves[symbol]);  // symbol exist in the tree
   updateTree(symbol);
 }
 
@@ -52,6 +52,7 @@ void AHCTree::writePath(AHCNode* des) {
   while (!tempCode.empty()) {
     tempWrite = tempCode.top();
     outbuf.writeBit(tempWrite);
+    cout << tempWrite << endl;
     tempCode.pop();
   } 
 }
@@ -61,58 +62,67 @@ void AHCTree::updateTree(int symbol) {
   if (leaves[symbol]) {  // if this symbol is in the tree
     tempNode = leaves[symbol];
     while(tempNode) {
-      if (tempNode->p)
-        swap(findMax(tempNode->count), tempNode);
+      if (tempNode->p)  // if not root
+        swap(findMax(tempNode), tempNode);
       tempNode->count++; 
       tempNode = tempNode->p;
     }
   } 
   else {  // new symbol
-    NYT->c0 = new AHCNode(0, -1, 512-size);
-    nodes[512-size++] = NYT->c0;
-    NYT->c1 = new AHCNode(1, symbol, 512-size);
-    nodes[512-size++] = NYT->c1;
-    leaves[symbol] = NYT->c1;
-    NYT->c0->p = NYT;
+    NYT->c1 = new AHCNode(1, symbol, 512-size);  // split node to a symbol
+    nodes[512-size++] = NYT->c1;  // update nodes index
+    NYT->c0 = new AHCNode(0, -1, 512-size);  // split node to a NYT
+    nodes[512-size++] = NYT->c0;   // update nodes index
+    leaves[symbol] = NYT->c1;  // update leaves index
+
+    NYT->c0->p = NYT;  // update relations
     NYT->c1->p = NYT;
-    NYT = NYT->c0;
+
+    NYT = NYT->c0;  // update NYT pointer
 
     tempNode = NYT;
     while (tempNode->p) {  // update count until root
       tempNode = tempNode->p;
       if (tempNode->p)
-        swap(findMax(tempNode->count), tempNode);  // swap order and position
+        swap(findMax(tempNode), tempNode);  // swap order and position
       tempNode->count++;
     }
   }
 }
 
-AHCNode* AHCTree::findMax(unsigned int count) const {
-  int order = 512;  // order of nodes
-  while(nodes[order]->count > count)
+
+AHCNode* AHCTree::findMax(AHCNode* tempNode) const {
+  int order = 512;  // order of nodes, start from largest order
+  while( (nodes[order]->count > tempNode->count) ||  // while order not bigger
+        (nodes[order]->symbol * tempNode->symbol < 0) ||  // or different type
+        ( (nodes[order]->symbol * tempNode->symbol == 0) &&  // of symbol
+          (nodes[order]->symbol + tempNode->symbol < 0) ) )
     order--;
   return nodes[order];
 }
 
 void AHCTree::swap(AHCNode* n1, AHCNode* n2) {
+  /* swap parents' child pointer*/
   if (n1->p->c0 == n1)
     n1->p->c0 = n2;
   else
     n1->p->c1 = n2;
-
   if (n2->p->c0 == n2)
     n2->p->c0 = n1;
   else
-    n2->p->c1 = n2;
+    n2->p->c1 = n1;
 
+  /* swap parent pointer */
   AHCNode* temp = n1->p;
   n1->p = n2->p;
   n2->p = temp;
 
+  /* swap order value */
   int tempO = n1->order;
   n1->order = n2->order;
   n2->order = tempO;
 
+  /* swap node pointer */
   temp = nodes[n1->order];
   nodes[n1->order] = nodes[n2->order];
   nodes[n2->order] = temp;
@@ -134,6 +144,7 @@ int AHCTree::decode() {
   if (tempNode == NYT) {
     tempVal = inbuf.readSym(); 
   }
+
   else {
     tempVal = tempNode->symbol;   
   }
@@ -141,12 +152,13 @@ int AHCTree::decode() {
   if (tempVal == 0x01ff)
     return tempVal;
       
-  updateTree(tempVal & 0x00ff);
+  updateTree(tempVal & 0x00ff);  //update tree with the 8bit ascii symbol
   return tempVal;
 }
 
 void AHCTree::end() {
+  writePath(NYT);
   for (int i = 0; i < 9; i++)
-    outbuf.writeBit(1);
+    outbuf.writeBit(1);  // psudo-code is 0x01ff
   outbuf.flush();
 }

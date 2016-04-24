@@ -48,7 +48,7 @@ class BitOutputStream {
    */
   void writeBit(int i);
 
-  /** **/
+  /** Write in 9 least significan bits in symbol**/
   void writeSym(int symbol);
 };
 

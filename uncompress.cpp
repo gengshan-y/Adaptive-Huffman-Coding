@@ -54,13 +54,17 @@ int main(int argc, char* argv[]) {
     /*** MAIN IMPLIMENTATION OF UNCOMPRESS***/
     AHCTree AHCT(out, in);
 
-    /** Decode using bit buffer **/
+    /** Decode **/
     int tempSymbol;
     while (!in.eof()) {
       tempSymbol = AHCT.decode();
-      if (tempSymbol != 0x01ff)
+      if (tempSymbol != 0x01ff) {  // Psudo-EOF is 0x01ff
         out << (unsigned char)tempSymbol;
+      }
+      else break;
     }
-  } 
+  }
+  in.close();
+  out.close();
   return 0;
 }

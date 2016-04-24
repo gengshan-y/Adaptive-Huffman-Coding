@@ -44,7 +44,8 @@ class BitInputStream {
   
   /** Return the nth bit from the right of a byte argument **/
   unsigned char bitValue(unsigned char b, int n);
-
+  
+  /** Read in 9 bits standing for symbols and return **/
   int readSym();
 };
 

@@ -32,7 +32,7 @@ class AHCTree {
     vector<AHCNode*> nodes;  // pointers to nodes representing orders
     std::ostream & out;  // output buffer
     BitOutputStream outbuf;
-    std::istream & in;
+    std::istream & in;  // input buffer
     BitInputStream inbuf;
 
  public:
@@ -48,29 +48,31 @@ class AHCTree {
 
     ~AHCTree();
 
-    /** Write to the given BitOutputStream
-     *  the sequence of bits coding the given symbol.
-     *  PRECONDITION: build() has been called, to create the coding
-     *  tree, and initialize root pointer and leaves vector.
+    /**  Adaptively build tree and encode symbol, given an input symbol
      */
     void encode(int symbol);
 
-    /** Return symbol coded in the next sequence of bits from the stream.
-     *  PRECONDITION: build() has been called, to create the coding
-     *  tree, and initialize root pointer and leaves vector.
+    /** Adaptively build tree and decode symbol, return the decoded symbol
      */
     int decode();
 
+    /** Write to NYF and EOF code, then flush() when encoding is finished
+     */
     void end();
  private:
+    /** Helper method for ~AHCTree **/
     static void deleteAll(AHCNode* n);
     
+    /** Helper method: write the path from root to des**/
     void writePath(AHCNode* des);
-
+    
+    /** Helper method: updata tree given symbol**/
     void updateTree(int symbol);
+ 
+    /** find the max-ordered node with the same count as tempNode**/
+    AHCNode* findMax(AHCNode* tempNode) const;
 
-    AHCNode* findMax(unsigned int count) const;
-
+    /** swap position and order attribute**/
     void swap(AHCNode* n1, AHCNode* n2);
 };
 
