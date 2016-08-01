@@ -9,6 +9,8 @@ To use:
 `$ make`
 `$ ./compress <input filename> <output filename>`
 
-It will generate encoded file. To decode:
+It will generate encoded file. 
+
+To decode:
 
 `$ ./uncompress <input filename> <output filename>`
